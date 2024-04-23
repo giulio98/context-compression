@@ -3,6 +3,11 @@ train:
     _target_: "context_compression.custom_datasets.qa_dataset.QADataset"
     split: "train"
     data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
         use_fp16: False
         dataset_name: "squad_v2"
         pad_to_max_length: True
@@ -17,6 +22,11 @@ validation:
     _target_: "context_compression.custom_datasets.qa_dataset.QADataset"
     split: "validation"
     data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
         use_fp16: False
         dataset_name: "squad_v2"
         pad_to_max_length: True
@@ -31,6 +41,11 @@ test:
     _target_: "context_compression.custom_datasets.qa_dataset.QADataset"
     split: "validation"
     data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
         use_fp16: False
         dataset_name: "squad_v2"
         pad_to_max_length: True

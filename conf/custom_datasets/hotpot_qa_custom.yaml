@@ -1,0 +1,22 @@
+version_2_with_negative: False
+test:
+    _target_: "generative_modeling.custom_datasets.llama_dataset_squad_custom.LlamaDatasetCustom"
+    split: "test"
+    data_config:
+        prompt: "Answer the question based on the given passages. Only give me the answer and do not output any other words."
+        question_prompt: null
+        question_column: "input"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "_id"
+        use_fp16: False
+        dataset_name: "THUDM/LongBench"
+        pad_to_max_length: False
+        max_length: 256
+        max_answer_length: 32
+        dataset_config_name: "hotpotqa"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 64
+        context_max_length: 21000

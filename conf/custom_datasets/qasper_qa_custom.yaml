@@ -1,0 +1,22 @@
+version_2_with_negative: False
+test:
+    _target_: "generative_modeling.custom_datasets.llama_dataset_squad_custom.LlamaDatasetCustom"
+    split: "test"
+    data_config:
+        prompt: "You are given a scientific article and a question. Answer the question as concisely as you can, using a single phrase or sentence if possible. If the question cannot be answered based on the information in the article, write \"unanswerable\". If the question is a yes/no question, answer \"yes\", \"no\", or \"unanswerable\". Do not provide any explanation."
+        question_prompt: null
+        question_column: "input"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "_id"
+        use_fp16: False
+        dataset_name: "THUDM/LongBench"
+        pad_to_max_length: False
+        max_length: 1024
+        max_answer_length: 128
+        dataset_config_name: "qasper"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 64
+        context_max_length: 25000

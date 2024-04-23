@@ -1,0 +1,22 @@
+version_2_with_negative: False
+test:
+    _target_: "generative_modeling.custom_datasets.llama_dataset_squad_custom.LlamaDatasetCustom"
+    split: "test"
+    data_config:
+        prompt: "You are given some paragraphs below sourced from Wikipedia. Some of them may be duplicates. Please carefully read these paragraphs and determine how many unique paragraphs there are after removing duplicates."
+        question_prompt: "how many non-repeating paragraphs are there in total? Please enter the final count of unique paragraphs after removing duplicates. The output format should only contain the number, such as 1, 2, 3, and so on."
+        question_column: "input"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "_id"
+        use_fp16: False
+        dataset_name: "THUDM/LongBench"
+        pad_to_max_length: False
+        max_length: 10000
+        max_answer_length: 32
+        dataset_config_name: "passage_count"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 256
+        context_max_length: 35000

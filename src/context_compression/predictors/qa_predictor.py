@@ -16,8 +16,8 @@ logger = get_logger(__name__)
 
 
 class QAModelPredictor(ModelQAPredictor, ABC):
-    def __init__(self, predictor_config, tokenizer, eval_examples, eval_dataset):
-        super().__init__(predictor_config, tokenizer, eval_examples, eval_dataset)
+    def __init__(self, predictor_config, tokenizer, eval_examples, eval_dataset, data_config):
+        super().__init__(predictor_config, tokenizer, eval_examples, eval_dataset, data_config)
 
     @staticmethod
     def _create_and_fill_np_array(start_or_end_logits, dataset, max_len):

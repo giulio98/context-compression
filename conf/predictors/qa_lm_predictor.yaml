@@ -1,7 +1,7 @@
-_target_: "context_compression.predictors.language_modeling_predictor.LanguageModelingQAPredictor"
+_target_: "generative_modeling.predictors.language_modeling_predictor.LanguageModelingQAPredictor"
 predictor_config:
     metric_name: "squad_v2"
-    max_answer_length: 32
+    max_answer_length: ${custom_datasets.test.data_config.max_answer_length}
     num_beams: 1
     do_sample: False
     temperature: 1.0
@@ -12,3 +12,5 @@ predictor_config:
     version_2_with_negative: ${custom_datasets.version_2_with_negative}
     pad_to_max_length: True
     task_type: "Seq2Seq"
+    compute_perplexity: False
+    output_file_path: ${trainers.evaluation_config.output_dir}/predictions.csv # improve logic for trainer_config

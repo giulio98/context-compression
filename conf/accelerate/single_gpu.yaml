@@ -2,7 +2,7 @@ compute_environment: LOCAL_MACHINE
 debug: false
 distributed_type: 'NO'
 downcast_bf16: 'no'
-gpu_ids: '7' # change gpu id here
+gpu_ids: '0' # change gpu id here
 machine_rank: 0
 main_training_function: main
 mixed_precision: 'no'

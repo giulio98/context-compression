@@ -5,10 +5,10 @@ logs
 notebooks
 # ignore the _version.py file
 _version.py
-.nfs*
+
 # .gitignore defaults for python and pycharm
 .idea
-
+.nfs*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

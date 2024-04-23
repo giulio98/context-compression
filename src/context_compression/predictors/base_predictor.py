@@ -9,7 +9,7 @@ class ModelPredictor(ABC):
     the implementation of the predict and post_processing methods.
     """
 
-    def __init__(self, predictor_config, tokenizer, eval_examples, eval_dataset):
+    def __init__(self, predictor_config, tokenizer, eval_examples, eval_dataset, data_config):
         """
         Initialize the ModelPredictor.
 
@@ -23,7 +23,10 @@ class ModelPredictor(ABC):
         self.eval_dataset = eval_dataset
         self.tokenizer = tokenizer
         self.metric_name = predictor_config.metric_name
-        self.metric = evaluate.load(self.metric_name)
+        self.compute_perplexity = predictor_config.compute_perplexity
+        self.data_config = data_config
+        if "squad" in self.metric_name or "rouge" in self.metric_name:
+            self.metric = evaluate.load(self.metric_name)
 
     @abstractmethod
     def predict(self, accelerator, model, dataloader):

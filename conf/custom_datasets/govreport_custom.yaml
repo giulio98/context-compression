@@ -1,0 +1,22 @@
+version_2_with_negative: False
+test:
+    _target_: "generative_modeling.custom_datasets.llama_dataset_squad_custom.LlamaDatasetCustom"
+    split: "test"
+    data_config:
+        prompt: "You are given a report by a government agency. Write a one-page summary of the report."
+        question_prompt: "Now, write a one-page summary of the report."
+        question_column: "input"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "_id"
+        use_fp16: False
+        dataset_name: "THUDM/LongBench"
+        pad_to_max_length: False
+        max_length: 10000
+        max_answer_length: 512
+        dataset_config_name: "gov_report"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 64
+        context_max_length: 61000

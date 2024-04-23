@@ -1,5 +1,5 @@
-FROM nvcr.io/nvidia/pytorch:22.12-py3
-
+FROM nvcr.io/nvidia/pytorch:23.04-py3
+ENV DEBIAN_FRONTEND=noninteractive
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
@@ -12,14 +12,11 @@ ENV PYTHONUNBUFFERED 1
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         vim \
         tmux \
     && rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
 # Copy necessary files and directories
 COPY . .
 
@@ -33,5 +30,7 @@ RUN groupadd -g $GROUP_ID jovyan && \
     usermod -aG video jovyan && \
     chown -R jovyan:jovyan /home/jovyan
 USER jovyan
+
+EXPOSE 8888
 
 CMD ["/bin/sh"]

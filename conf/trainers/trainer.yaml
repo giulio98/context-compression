@@ -15,6 +15,8 @@ training_config:
   output_dir: ${oc.env:LOGS_ROOT}/exp_run_fine_tuning
   hub_model_id: "" # The name of the repository to keep in sync with the local output_dir.
   hub_token: "" # The token to use to push to the Model Hub.
+  max_train_samples: null # For debugging purposes or quicker training, truncate the number of training examples to this value if set.
+  max_val_samples: null # For debugging purposes or quicker training, truncate the number of evaluation examples to this value if set.
 
 
 optimization_config:
@@ -36,6 +38,7 @@ evaluation_config:
   per_device_eval_batch_size: 4
   resume_from_checkpoint: True
   zero_shot: False
+  max_eval_samples: null
 
 logging_config:
   project_name: "default_project"

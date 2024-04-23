@@ -1,0 +1,22 @@
+version_2_with_negative: False
+test:
+    _target_: "generative_modeling.custom_datasets.llama_dataset_squad_custom.LlamaDatasetCustom"
+    split: "test"
+    data_config:
+        prompt: "You are given some examples. Summarize the dialogue into a few short sentences."
+        question_prompt: null
+        question_column: "input"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "_id"
+        use_fp16: False
+        dataset_name: "THUDM/LongBench"
+        pad_to_max_length: False
+        max_length: 10000
+        max_answer_length: 128
+        dataset_config_name: "samsum"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 600
+        context_max_length: 30000

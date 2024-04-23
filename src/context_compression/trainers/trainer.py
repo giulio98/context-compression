@@ -3,7 +3,6 @@ import math
 import os
 from functools import partial
 from pathlib import Path
-
 import hydra
 from accelerate.utils import set_seed
 from huggingface_hub import create_repo, Repository
@@ -46,7 +45,7 @@ class Trainer(abc.ABC):
         # in the environment
         repo = None
         # Handle the repository creation
-        if accelerator.is_main_process:
+        with accelerator.main_process_first():
             if self.training_config.push_to_hub:
                 # Retrieve of infer repo_name
                 repo_name = self.training_config.hub_model_id
@@ -65,12 +64,17 @@ class Trainer(abc.ABC):
                         gitignore.write("epoch_*\n")
             elif self.training_config.output_dir is not None:
                 os.makedirs(self.training_config.output_dir, exist_ok=True)
-        accelerator.wait_for_everyone()
+        with accelerator.main_process_first():
+            ds_train = ds_train_obj.load()
+            ds_val = ds_val_obj.load()
+        # ds_train = ds_train.filter(ds_train_obj.filter)
+        # ds_val = ds_val.filter(ds_val_obj.filter)
+        if self.training_config.max_train_samples is not None:
+            # We will select sample from whole data if argument is specified
+            ds_train = ds_train.select(range(self.training_config.max_train_samples.max_train_samples))
 
-        ds_train = ds_train_obj.load()
-        ds_val = ds_val_obj.load()
-        ds_train = ds_train.filter(ds_train_obj.filter)
-        ds_val = ds_val.filter(ds_val_obj.filter)
+        if self.training_config.max_val_samples is not None:
+            ds_val = ds_val.select(range(self.training_config.max_val_samples.max_val_samples))
 
         with accelerator.main_process_first():
             ds_train_data = ds_train.map(
@@ -87,7 +91,11 @@ class Trainer(abc.ABC):
                 remove_columns=ds_val_obj.column_names,
                 desc="Running tokenizer on validation dataset"
             )
-        predictor = hydra.utils.instantiate(predictor_config, tokenizer=tokenizer, eval_examples=ds_val, eval_dataset=ds_val_data, _recursive_=False)
+            if self.training_config.max_train_samples is not None:
+                ds_train_data = ds_train_data.select(range(self.training_config.max_train_samples))
+            if self.training_config.max_val_samples is not None:
+                ds_val_data = ds_val_data.select(range(self.training_config.max_val_samples))
+        predictor = hydra.utils.instantiate(predictor_config, tokenizer=tokenizer, eval_examples=ds_val, eval_dataset=ds_val_data, data_config=ds_val_obj.data_config, _recursive_=False)
 
         # train_batch_size = per_gpu_train_batch_size * accelerator.state.num_processes
         train_dataloader = DataLoader(ds_train_data, shuffle=True, batch_size=self.training_config.per_device_train_batch_size, collate_fn=ds_train_obj.get_data_collator())
@@ -313,16 +321,13 @@ class Trainer(abc.ABC):
             A dictionary containing evaluation metrics.
             :param accelerator:
         """
-        # if model.get_input_embeddings().num_embeddings != len(tokenizer):
-        #     model.resize_token_embeddings(len(tokenizer))
         if self.evaluation_config.seed is not None:
             set_seed(self.evaluation_config.seed)
-        # if model.get_input_embeddings().num_embeddings <= len(tokenizer):
-        #     logger.info("Resizing model token embeddings")
-        #     model.resize_token_embeddings(len(tokenizer))
-
-        ds_eval = ds_eval_obj.load()
-        ds_eval = ds_eval.filter(ds_eval_obj.filter)
+        with accelerator.main_process_first():
+            ds_eval = ds_eval_obj.load()
+        # ds_eval = ds_eval.filter(ds_eval_obj.filter)
+        if self.evaluation_config.max_eval_samples is not None:
+            ds_eval = ds_eval.select(range(self.evaluation_config.max_eval_samples))
         with accelerator.main_process_first():
             ds_eval_data = ds_eval.map(
                 ds_eval_obj.tokenize,
@@ -331,7 +336,10 @@ class Trainer(abc.ABC):
                 remove_columns=ds_eval_obj.column_names,
                 desc="Running tokenizer on evaluation dataset"
             )
-        predictor = hydra.utils.instantiate(predictor_config, tokenizer=tokenizer, eval_examples=ds_eval, eval_dataset=ds_eval_data)
+
+        if self.evaluation_config.max_eval_samples is not None:
+            ds_eval_data = ds_eval_data.select(range(self.evaluation_config.max_eval_samples))
+        predictor = hydra.utils.instantiate(predictor_config, tokenizer=tokenizer, eval_examples=ds_eval, eval_dataset=ds_eval_data, data_config=ds_eval_obj.data_config)
         eval_dataloader = DataLoader(ds_eval_data.remove_columns(ds_eval_obj.columns_to_remove_for_model), batch_size=self.evaluation_config.per_device_eval_batch_size, collate_fn = ds_eval_obj.get_data_collator())
 
         model, eval_dataloader = accelerator.prepare(model, eval_dataloader)
@@ -352,8 +360,7 @@ class Trainer(abc.ABC):
             accelerator.init_trackers(project_name=self.logging_config.project_name, config=experiment_config, init_kwargs={"wandb": {"entity": self.logging_config.entity_name, "name": os.path.basename(self.logging_config.name)}})
         # Use the predictor to get the evaluation results
         results = predictor.predict(accelerator, model, eval_dataloader)
-        if self.evaluation_config.with_tracking:
-            accelerator.log(results)
-            accelerator.end_training()
-
-
+        with accelerator.main_process_first():
+            if self.evaluation_config.with_tracking:
+                accelerator.log(results)
+                accelerator.end_training()
