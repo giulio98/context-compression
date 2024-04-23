@@ -1,0 +1,13 @@
+_target_: "context_compression.models.modeling_llama.LlamaForCompressedCausalLM.from_pretrained"
+pretrained_model_name_or_path: None
+config:
+  _target_: "transformers.AutoConfig.from_pretrained"
+  pretrained_model_name_or_path: None
+  trust_remote_code: True
+trust_remote_code: True
+quantization_config:
+  _target_: "transformers.BitsAndBytesConfig"
+  load_in_4bit: True
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_compute_dtype: float16
+  bnb_4bit_use_double_quant: True

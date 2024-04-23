@@ -1,0 +1,57 @@
+version_2_with_negative: True
+train:
+    _target_: "context_compression.custom_datasets.llama_dataset_squad.LlamaDataset"
+    split: "train"
+    data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
+        use_fp16: False
+        dataset_name: "squad_v2"
+        pad_to_max_length: True
+        max_length: 512
+        max_answer_length: 32
+        dataset_config_name: "squad_v2"
+        train_file: None
+        validation_file: None
+        test_file: None
+
+validation:
+    _target_: "context_compression.custom_datasets.llama_dataset_squad.LlamaDataset"
+    split: "validation"
+    data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
+        use_fp16: False
+        dataset_name: "squad_v2"
+        pad_to_max_length: True
+        max_length: 512
+        max_answer_length: 32
+        dataset_config_name: "squad_v2"
+        train_file: None
+        validation_file: None
+        test_file: None
+
+test:
+    _target_: "context_compression.custom_datasets.llama_dataset_squad.LlamaDataset"
+    split: "validation"
+    data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
+        use_fp16: False
+        dataset_name: "squad_v2"
+        pad_to_max_length: True
+        max_length: 512
+        max_answer_length: 32
+        dataset_config_name: "squad_v2"
+        train_file: None
+        validation_file: None
+        test_file: None

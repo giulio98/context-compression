@@ -1,0 +1,17 @@
+# metadata specialised for each experiment
+core:
+  project_name: context-compression
+  storage_dir: ${oc.env:PROJECT_ROOT}/storage
+  version: 0.0.1
+  tags: null
+
+defaults:
+  - hydra: default
+  - custom_datasets: squad_v2
+  - models: qa_model
+  - predictors: qa_predictor
+  - tokenizers: auto_tokenizer
+  - trainers: trainer
+  - _self_ # as last argument to allow the override of parameters via this main config
+#    Decomment this parameter to get parallel job running
+#  - hydra/launcher: joblib

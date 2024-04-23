@@ -1,0 +1,14 @@
+_target_: "context_compression.predictors.language_modeling_predictor.LanguageModelingQAPredictor"
+predictor_config:
+    metric_name: "squad_v2"
+    max_answer_length: 32
+    num_beams: 1
+    do_sample: False
+    temperature: 1.0
+    top_k: 50
+    top_p: 1.0
+    repetition_penalty: 1.0
+    batch_size: ${trainers.training_config.per_device_val_batch_size}
+    version_2_with_negative: ${custom_datasets.version_2_with_negative}
+    pad_to_max_length: True
+    task_type: "Seq2Seq"

@@ -1,0 +1,57 @@
+version_2_with_negative: False
+train:
+    _target_: "context_compression.custom_datasets.qa_dataset.QADataset"
+    split: "train"
+    data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
+        use_fp16: False
+        dataset_name: "squad"
+        pad_to_max_length: True
+        doc_stride: 128
+        max_length: 512
+        dataset_config_name: "squad"
+        train_file: None
+        validation_file: None
+        test_file: None
+
+validation:
+    _target_: "context_compression.custom_datasets.qa_dataset.QADataset"
+    split: "validation"
+    data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
+        use_fp16: False
+        dataset_name: "squad"
+        pad_to_max_length: True
+        doc_stride: 128
+        max_length: 512
+        dataset_config_name: "squad"
+        train_file: None
+        validation_file: None
+        test_file: None
+
+test:
+    _target_: "context_compression.custom_datasets.qa_dataset.QADataset"
+    split: "validation"
+    data_config:
+        question_prompt: null
+        question_column: "question"
+        context_column: "context"
+        answer_column: "answers"
+        id_column: "id"
+        use_fp16: False
+        dataset_name: "squad"
+        pad_to_max_length: True
+        doc_stride: 128
+        max_length: 512
+        dataset_config_name: "squad"
+        train_file: None
+        validation_file: None
+        test_file: None

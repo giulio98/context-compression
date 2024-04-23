@@ -1,0 +1,22 @@
+_target_: "peft.LoraModel"
+model:
+  _target_: "transformers.AutoModelForCausalLM.from_pretrained"
+  pretrained_model_name_or_path: None
+  config:
+    _target_: "transformers.AutoConfig.from_pretrained"
+    pretrained_model_name_or_path: None
+    trust_remote_code: True
+  trust_remote_code: True
+  quantization_config:
+    _target_: "transformers.BitsAndBytesConfig"
+    load_in_4bit: True
+    bnb_4bit_quant_type: "nf4"
+    bnb_4bit_compute_dtype: float16
+    bnb_4bit_use_double_quant: False
+config:
+  _target_: "peft.LoraConfig"
+  lora_alpha: 16
+  lora_dropout: 0.1
+  r: 8
+  task_type: "CAUSAL_LM"
+adapter_name: "default"

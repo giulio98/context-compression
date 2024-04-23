@@ -1,0 +1,9 @@
+_target_: "context_compression.predictors.qa_predictor.QAModelPredictor"
+predictor_config:
+    metric_name: "squad_v2"
+    n_best_size: 20
+    max_answer_length: 32
+    null_score_diff_threshold: 0.0
+    output_dir: ${trainers.training_config.output_dir}
+    version_2_with_negative: ${custom_datasets.version_2_with_negative}
+    pad_to_max_length: True

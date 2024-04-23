@@ -1,0 +1,7 @@
+_target_: "transformers.AutoModelForCausalLM.from_pretrained"
+pretrained_model_name_or_path: None
+config:
+    _target_: "transformers.AutoConfig.from_pretrained"
+    pretrained_model_name_or_path: None
+    trust_remote_code: True
+trust_remote_code: True

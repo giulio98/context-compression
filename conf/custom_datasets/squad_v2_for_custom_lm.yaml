@@ -1,0 +1,45 @@
+version_2_with_negative: True
+train:
+    _target_: "context_compression.custom_datasets.seq2seq_dataset_squad_custom.Seq2SeqModelingCustomDataset"
+    split: "train"
+    data_config:
+        use_fp16: False
+        dataset_name: "squad_v2"
+        pad_to_max_length: True
+        max_length: 512
+        max_answer_length: 30
+        dataset_config_name: "squad_v2"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 64
+
+validation:
+    _target_: "context_compression.custom_datasets.seq2seq_dataset_squad_custom.Seq2SeqModelingCustomDataset"
+    split: "validation"
+    data_config:
+        use_fp16: False
+        dataset_name: "squad_v2"
+        pad_to_max_length: True
+        max_length: 512
+        max_answer_length: 30
+        dataset_config_name: "squad_v2"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 64
+
+test:
+    _target_: "context_compression.custom_datasets.seq2seq_dataset_squad_custom.Seq2SeqModelingCustomDataset"
+    split: "validation"
+    data_config:
+        use_fp16: False
+        dataset_name: "squad_v2"
+        pad_to_max_length: True
+        max_length: 512
+        max_answer_length: 30
+        dataset_config_name: "squad_v2"
+        train_file: None
+        validation_file: None
+        test_file: None
+        question_max_length: 64
