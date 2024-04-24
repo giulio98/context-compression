@@ -19,3 +19,5 @@ ujson
 dill
 vllm
 rouge_score
+fuzzywuzzy
+python-Levenshtein

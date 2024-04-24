@@ -20,7 +20,9 @@ class BaseDataset(ABC):
     def load(self):
         # Load the dataset
         if self.data_config.dataset_name is not None:
+            print(f"Loading dataset {self.data_config.dataset_name} with config {self.data_config.dataset_config_name}")
             raw_datasets = load_dataset(self.data_config.dataset_name, self.data_config.dataset_config_name)
+            print("Loaded!")
         else:
             data_files = {}
             if self.data_config.train_file is not None:
