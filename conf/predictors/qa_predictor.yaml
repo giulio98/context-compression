@@ -1,4 +1,4 @@
-_target_: "generative_modeling.predictors.qa_predictor.QAModelPredictor"
+_target_: "context_compression.predictors.qa_predictor.QAModelPredictor"
 predictor_config:
     metric_name: "squad_v2"
     n_best_size: 20

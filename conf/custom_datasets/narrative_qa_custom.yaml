@@ -1,6 +1,6 @@
 version_2_with_negative: False
 test:
-    _target_: "generative_modeling.custom_datasets.llama_dataset_squad_custom.LlamaDatasetCustom"
+    _target_: "context_compression.custom_datasets.llama_dataset_squad_custom.LlamaDatasetCustom"
     split: "test"
     data_config:
         prompt: "You are given a story, which can be either a novel or a movie script, and a question. Answer the question as concisely as you can, using a single phrase if possible. Do not provide any explanation."
