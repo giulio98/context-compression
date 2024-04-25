@@ -12,11 +12,11 @@ test:
         use_fp16: False
         dataset_name: "THUDM/LongBench"
         pad_to_max_length: False
-        max_length: 512
-        max_answer_length: 128
+        max_length: 512 # this is the length of system prompt + question
+        max_answer_length: 128 # length of answer
         dataset_config_name: "narrativeqa"
         train_file: None
         validation_file: None
         test_file: None
-        question_max_length: 64
-        context_max_length: 85000
+        question_max_length: 64 # length of question
+        context_max_length: 85000 # length of context

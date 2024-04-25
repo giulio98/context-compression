@@ -255,7 +255,6 @@ class LlamaForCompressedCausalLM(LlamaForCausalLM):
                     past_key_values.update_rope(layer_idx, past_key_values[layer_idx][0][:, :, :current_seq_length + past_cache_len],
                                                             important_tokens)
 
-
                 past_attention_mask = torch.ones(segment_attention_mask.size(0), k, device=segment_attention_mask.device, dtype=segment_attention_mask.dtype)
             end_processing_time = time.time()
             accelerator.log({
