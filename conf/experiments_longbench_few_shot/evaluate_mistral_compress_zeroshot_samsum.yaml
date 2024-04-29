@@ -1,0 +1,41 @@
+# @package _global_
+defaults:
+  - override /custom_datasets: sam_sum_custom
+  - override /models: quantized_causal_mistral_compress_model
+  - override /tokenizers: causal_auto_tokenizer
+  - override /trainers: trainer
+  - override /predictors: qa_lm_predictor
+
+
+models:
+  pretrained_model_name_or_path: "mistralai/Mistral-7B-Instruct-v0.2"
+  mode: "attention_score"
+  compression_factor: 1.0
+  split_size: 512
+  target_token: 3000
+  distance_metric: None
+  config:
+    pretrained_model_name_or_path: "mistralai/Mistral-7B-Instruct-v0.2"
+
+tokenizers:
+  pretrained_model_name_or_path: "mistralai/Mistral-7B-Instruct-v0.2"
+
+predictors:
+  predictor_config:
+    metric_name: "rouge"
+    task_type: "CLM"
+    batch_size: ${trainers.evaluation_config.per_device_eval_batch_size}
+
+
+trainers:
+  mode: "eval"
+  evaluation_config:
+    with_tracking: True
+    output_dir: ${oc.env:LOGS_ROOT}/eval_zeroshot_sam_sum_lm_target${models.target_token}_chunksize${models.split_size}_mistral_7b-chat_reorderfix_fixedk
+    per_device_eval_batch_size: 1
+    resume_from_checkpoint: False
+    zero_shot: True
+
+  logging_config:
+    project_name: "sam_sum"
+    name: ${trainers.evaluation_config.output_dir}

@@ -2,11 +2,8 @@ from abc import ABC
 
 from .causal_dataset_squad import CausalModelingDataset
 from transformers import PreTrainedTokenizer
-
-
-B_INST, E_INST = "[INST]", "[/INST]"
-B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
-BOS, EOS = "<s>", "</s>"
+import jinja2
+from jinja2.exceptions import TemplateError
 
 class LlamaDatasetCustom(CausalModelingDataset, ABC):
 
@@ -32,7 +29,19 @@ class LlamaDatasetCustom(CausalModelingDataset, ABC):
 
     def generate_input(self, _question, _context):
         prompt = " ".join(["question:", _question.lstrip()])
-        return f"{BOS}{B_INST} {B_SYS}{self.system_prompt}{E_SYS} {prompt.strip()} {E_INST}"
+        try:
+            messages = [
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content":  prompt.strip()},
+            ]
+            model_input = self.tokenizer.apply_chat_template(messages, tokenize=False)
+        except TemplateError:
+            messages = [
+                {"role": "user", "content": self.system_prompt + prompt.strip()},
+            ]
+            model_input = self.tokenizer.apply_chat_template(messages, tokenize=False)
+            
+        return model_input
 
     @staticmethod
     def generate_question(_question):
