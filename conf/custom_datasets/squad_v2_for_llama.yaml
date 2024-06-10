@@ -17,6 +17,7 @@ train:
         train_file: None
         validation_file: None
         test_file: None
+        use_rag: False
 
 validation:
     _target_: "context_compression.custom_datasets.llama_dataset_squad.LlamaDataset"
@@ -36,6 +37,7 @@ validation:
         train_file: None
         validation_file: None
         test_file: None
+        use_rag: False
 
 test:
     _target_: "context_compression.custom_datasets.llama_dataset_squad.LlamaDataset"
@@ -55,3 +57,4 @@ test:
         train_file: None
         validation_file: None
         test_file: None
+        use_rag: False

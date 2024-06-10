@@ -13,6 +13,8 @@ models:
   compression_factor: 1.0
   split_size: 512
   target_token: 3000
+  condition: "question"
+  normalize: True
   distance_metric: None
   config:
     pretrained_model_name_or_path: "mistralai/Mistral-7B-Instruct-v0.2"
@@ -31,7 +33,7 @@ trainers:
   mode: "eval"
   evaluation_config:
     with_tracking: True
-    output_dir: ${oc.env:LOGS_ROOT}/eval_zeroshot_multinews_lm_target${models.target_token}_chunksize${models.split_size}_mistral_7b-chat_reorderfix_fixedk
+    output_dir: ${oc.env:LOGS_ROOT}/mistral_target${models.target_token}_chunksize${models.split_size}_condition${models.condition}_normalize${models.normalize}
     per_device_eval_batch_size: 1
     resume_from_checkpoint: False
     zero_shot: True

@@ -16,6 +16,7 @@ train:
         train_file: None
         validation_file: None
         test_file: None
+        use_rag: False
 
 validation:
     _target_: "context_compression.custom_datasets.seq2seq_dataset_squad.Seq2SeqModelingDataset"
@@ -34,6 +35,7 @@ validation:
         train_file: None
         validation_file: None
         test_file: None
+        use_rag: False
 
 test:
     _target_: "context_compression.custom_datasets.seq2seq_dataset_squad.Seq2SeqModelingDataset"
@@ -52,3 +54,4 @@ test:
         train_file: None
         validation_file: None
         test_file: None
+        use_rag: False

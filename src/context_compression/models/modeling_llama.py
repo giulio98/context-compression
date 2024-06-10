@@ -67,8 +67,8 @@ class ModifiedDynamicCache(DynamicCache):
             new_sin
         )
         self.value_cache[layer_index] = self.gather_important_tokens(self.value_cache[layer_index], important_pos)
-        # self.cos_sin_cache[layer_index]["cos"] = new_cos
-        # self.cos_sin_cache[layer_index]["sin"] = new_sin
+        self.cos_sin_cache[layer_index]["cos"] = new_cos
+        self.cos_sin_cache[layer_index]["sin"] = new_sin
         self.seen_tokens = important_pos.size(1)
         return self.key_cache[layer_index], self.value_cache[layer_index]
 
@@ -129,14 +129,14 @@ from transformers.models.llama.modeling_llama import LlamaConfig
 logger = logging.get_logger(__name__)
 
 class LlamaForCompressedCausalLM(LlamaForCausalLM):
-    def __init__(self, config: LlamaConfig, mode, compression_factor, split_size, target_token, distance_metric=None):  # changed by GC
+    def __init__(self, config: LlamaConfig, mode, split_size, target_token, condition="question", normalize=True, distance_metric=None):  # changed by GC
         config._attn_implementation = "eager"
         super().__init__(config)
-        self.compression_factor = compression_factor  # added by GC
-        self.split_size = split_size  # added by GC
-        self.segment_length = self.split_size
         self.mode = mode
         self.target_token = target_token
+        self.split_size = split_size
+        self.condition = condition
+        self.normalize = normalize
         if distance_metric == "euclidean":
             self.p = 2
         elif distance_metric == "manhattan":
@@ -167,11 +167,19 @@ class LlamaForCompressedCausalLM(LlamaForCausalLM):
             "context_size_min": context_ids.size(1),
             "context_size_max": context_ids.size(1)
         })
-        if context_ids.size(1) > self.target_token:
+        print("context size is", context_ids.size(1))
+        print("input id size is", input_ids.size(-1))
+        
+        if context_ids.size(1) +  input_ids.size(-1) > self.target_token and not self.target_token == 4096:
+            print("Compressing...")
             start_processing_time = time.time()
-            self.compression_factor = int(math.ceil(context_ids.size(1) / self.target_token))
-            context_ids_list = torch.split(context_ids, self.segment_length, dim=1)
-            context_attention_mask_list = torch.split(context_attention_mask, self.segment_length, dim=1)
+            if self.split_size == "auto":
+                segment_length = self.target_token + generate_kwargs['max_new_tokens'] -  input_ids.size(-1)
+            else:
+                segment_length = self.split_size
+            self.compression_factor = int(math.ceil(context_ids.size(1) / (self.target_token - input_ids.size(-1))))
+            context_ids_list = torch.split(context_ids, segment_length, dim=1)
+            context_attention_mask_list = torch.split(context_attention_mask, segment_length, dim=1)
             past_attention_mask = torch.zeros(context_attention_mask.size(0), 0, dtype=context_attention_mask.dtype, device=context_attention_mask.device)
             for step, (segment_context_ids, segment_attention_mask) in enumerate(zip(context_ids_list, context_attention_mask_list)):
                 segment_attention_mask = torch.cat([past_attention_mask, segment_attention_mask], dim=1)
@@ -187,40 +195,31 @@ class LlamaForCompressedCausalLM(LlamaForCausalLM):
                         attention_mask=current_attention_mask,
                         position_ids=position_ids,
                         output_attentions=True,
-                        # output_hidden_states=True,
                         use_cache=True,
                         past_key_values=past_key_values
                     )
                 current_seq_length = segment_context_ids.size(1)
                 k = int(current_seq_length // self.compression_factor) + past_cache_len
-                # BEGIN DYNAMIC K
-                # max_k = int(current_seq_length // self.compression_factor) + past_cache_len
-                # min_k = past_cache_len
-
-                # context_layer_embeddings = output_question_aware.hidden_states[-1][:,
-                #                                 :current_seq_length + past_cache_len]
-                # question_layer_embedding = output_question_aware.hidden_states[-1][:, current_seq_length:].mean(dim=1)
-                # cosine_sim = torch.nn.functional.cosine_similarity(context_layer_embeddings,
-                #                                                      question_layer_embedding.unsqueeze(1), dim=-1)
-                # mean_cosine_sim = cosine_sim.mean()
-                # norm_mean_cosine_sim = (mean_cosine_sim + 1) / 2
-                # k = int(min_k + (max_k - min_k) * norm_mean_cosine_sim)
-                # END DYNAMIC K
                 for layer_idx, layer_attention in enumerate(output_question_aware.attentions):
                     if self.mode == "attention_score":
                         summed_attention = layer_attention.sum(dim=1)
-                        context_attention = summed_attention[:, current_seq_length:, :current_seq_length + past_cache_len]
-                        # BEGIN
                         tot_seq_len = summed_attention.size(2)
-                        non_zero_counts = torch.arange(1, tot_seq_len + 1, device=context_attention.device)
-                        non_zero_counts = non_zero_counts[current_seq_length + past_cache_len:]
-                        normalization_factors = non_zero_counts.float() / tot_seq_len
-                        context_attention = context_attention * normalization_factors[None, :, None]
-                        # END
-                        # non_zero_mask = context_attention != 0
-                        # non_zero_counts = non_zero_mask.sum(dim=2)
-                        # normalization_factors = non_zero_counts / context_attention.size(2)
-                        # context_attention = context_attention * normalization_factors[:, :, None]
+                        if self.condition == "question":
+                            context_attention = summed_attention[:, current_seq_length:, :current_seq_length + past_cache_len]
+                            non_zero_counts = torch.arange(1, tot_seq_len + 1, device=context_attention.device)
+                            non_zero_counts = non_zero_counts[current_seq_length + past_cache_len:]
+                        elif self.condition == "context":
+                            context_attention = summed_attention[:, :current_seq_length, :current_seq_length + past_cache_len]
+                            non_zero_counts = torch.arange(1, tot_seq_len + 1, device=context_attention.device)
+                            non_zero_counts = non_zero_counts[past_cache_len:past_cache_len + current_seq_length]
+                        elif self.condition == "all":
+                            context_attention = summed_attention[:, :, :current_seq_length + past_cache_len]
+                            non_zero_counts = torch.arange(1, tot_seq_len + 1, device=context_attention.device)
+                            non_zero_counts = non_zero_counts[past_cache_len:]
+                        if self.normalize:
+                            normalization_factors = non_zero_counts.float() / tot_seq_len
+                            context_attention = context_attention * normalization_factors[None, :, None]
+                        context_attention = summed_attention[:, current_seq_length:, :current_seq_length + past_cache_len]
                         aggregated_attention = context_attention.sum(dim=1)
                         _, important_tokens = torch.topk(aggregated_attention, k=k, dim=-1, largest=True)
                     elif self.mode == "cosine_similarity":
@@ -271,8 +270,13 @@ class LlamaForCompressedCausalLM(LlamaForCausalLM):
                         )
             return model_output
         else:
-            # context_ids_len = context_ids.size(1)
+            # if self.target_token == 4096:
+            #     context_ids_len = context_ids.size(1)
+            #     context_ids = context_ids[:, :context_ids_len-input_ids.size(-1)]
+            #     print("New context id size", context_ids.size(1))
+            #     context_attention_mask = context_attention_mask[:, :context_ids_len-input_ids.size(-1)]
             start_processing_time = time.time()
+            
             with torch.no_grad():
                 self.model(
                     input_ids=context_ids,

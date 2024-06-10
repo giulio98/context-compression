@@ -18,6 +18,7 @@ train:
         validation_file: None
         test_file: None
         question_max_length: 64
+        use_rag: False
 
 validation:
     _target_: "context_compression.custom_datasets.seq2seq_dataset_squad_custom.Seq2SeqModelingCustomDataset"
@@ -38,6 +39,7 @@ validation:
         validation_file: None
         test_file: None
         question_max_length: 64
+        use_rag: False
 
 test:
     _target_: "context_compression.custom_datasets.seq2seq_dataset_squad_custom.Seq2SeqModelingCustomDataset"
@@ -58,3 +60,4 @@ test:
         validation_file: None
         test_file: None
         question_max_length: 64
+        use_rag: False

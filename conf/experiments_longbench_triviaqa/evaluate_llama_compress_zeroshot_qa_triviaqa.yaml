@@ -10,9 +10,10 @@ defaults:
 models:
   pretrained_model_name_or_path: "meta-llama/Llama-2-7b-chat-hf"
   mode: "attention_score"
-  compression_factor: 1.0
   split_size: 512
   target_token: 3000
+  condition: "question"
+  normalize: True
   distance_metric: None
   config:
     pretrained_model_name_or_path: "meta-llama/Llama-2-7b-chat-hf"

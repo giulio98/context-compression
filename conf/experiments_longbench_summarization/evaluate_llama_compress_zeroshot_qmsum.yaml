@@ -10,9 +10,10 @@ defaults:
 models:
   pretrained_model_name_or_path: "meta-llama/Llama-2-7b-chat-hf"
   mode: "attention_score"
-  compression_factor: 1.0
   split_size: 512
   target_token: 3000
+  condition: "question"
+  normalize: True
   distance_metric: None
   config:
     pretrained_model_name_or_path: "meta-llama/Llama-2-7b-chat-hf"
@@ -31,7 +32,7 @@ trainers:
   mode: "eval"
   evaluation_config:
     with_tracking: True
-    output_dir: ${oc.env:LOGS_ROOT}/eval_zeroshot_qmsum_lm_target${models.target_token}_chunksize${models.split_size}_llama_7b-chat_reorderfix_fixedk
+    output_dir: ${oc.env:LOGS_ROOT}/llama_target${models.target_token}_chunksize${models.split_size}
     per_device_eval_batch_size: 1
     resume_from_checkpoint: False
     zero_shot: True

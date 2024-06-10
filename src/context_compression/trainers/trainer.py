@@ -340,7 +340,7 @@ class Trainer(abc.ABC):
 
         if self.evaluation_config.max_eval_samples is not None:
             ds_eval_data = ds_eval_data.select(range(self.evaluation_config.max_eval_samples))
-        logger.info("Instntiating predictor")
+        logger.info("Instantiating predictor...")
         predictor = hydra.utils.instantiate(predictor_config, tokenizer=tokenizer, eval_examples=ds_eval, eval_dataset=ds_eval_data, data_config=ds_eval_obj.data_config)
         eval_dataloader = DataLoader(ds_eval_data.remove_columns(ds_eval_obj.columns_to_remove_for_model), batch_size=self.evaluation_config.per_device_eval_batch_size, collate_fn = ds_eval_obj.get_data_collator())
 

@@ -89,8 +89,10 @@ class LanguageModelingQAPredictor(ModelQAPredictor, ABC):
         #references = [
         #    {k: v for k, v in ex.items() if k not in [self.data_config.question_column, self.data_config.context_column]} for ex in references
         #]
-        if "squad" in self.metric_name or "rouge" in self.metric_name:
+        if "squad" in self.metric_name:
             predict_metric = self.metric.compute(predictions=predictions, references=references)
+        elif "rouge" in self.metric_name:
+            predict_metric = self.metric.compute(predictions=predictions, references=references, use_stemmer=True)
         else:
             predict_metric = compute_longbench_metric(self.predictor_config.metric_name, predictions, references)
         results = {

@@ -6,6 +6,7 @@ import omegaconf
 import transformers
 from accelerate import Accelerator
 from omegaconf import DictConfig
+import torch
 
 from nn_core.common import PROJECT_ROOT
 
@@ -72,6 +73,8 @@ def run(cfg: DictConfig):
     # Instantiate model
     logger.info(f"Instantiating <{cfg.models['_target_']}>")
     model = hydra.utils.instantiate(cfg.models)
+    if model.dtype == torch.float32:
+        model = model.half()
     if not cfg.trainers.mode == "eval":
         print_trainable_parameters(model=model)
 

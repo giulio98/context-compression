@@ -20,3 +20,4 @@ test:
         test_file: None
         question_max_length: 64 # length of question
         context_max_length: 85000 # length of context
+        use_rag: False
