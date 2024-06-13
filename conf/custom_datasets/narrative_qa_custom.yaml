@@ -12,7 +12,7 @@ test:
         use_fp16: False
         dataset_name: "THUDM/LongBench"
         pad_to_max_length: False
-        max_length: 512 # this is the length of system prompt + question
+        max_length: 128 # this is the length of system prompt + question
         max_answer_length: 128 # length of answer
         dataset_config_name: "narrativeqa"
         train_file: None

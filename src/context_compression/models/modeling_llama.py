@@ -129,7 +129,7 @@ from transformers.models.llama.modeling_llama import LlamaConfig
 logger = logging.get_logger(__name__)
 
 class LlamaForCompressedCausalLM(LlamaForCausalLM):
-    def __init__(self, config: LlamaConfig, mode, split_size, target_token, condition="question", normalize=True, distance_metric=None):  # changed by GC
+    def __init__(self, config: LlamaConfig, mode, split_size, target_token, condition="question", normalize=True, is_full=False, distance_metric=None):  # changed by GC
         config._attn_implementation = "eager"
         super().__init__(config)
         self.mode = mode
@@ -137,6 +137,7 @@ class LlamaForCompressedCausalLM(LlamaForCausalLM):
         self.split_size = split_size
         self.condition = condition
         self.normalize = normalize
+        self.is_full = is_full
         if distance_metric == "euclidean":
             self.p = 2
         elif distance_metric == "manhattan":
@@ -270,11 +271,11 @@ class LlamaForCompressedCausalLM(LlamaForCausalLM):
                         )
             return model_output
         else:
-            # if self.target_token == 4096:
-            #     context_ids_len = context_ids.size(1)
-            #     context_ids = context_ids[:, :context_ids_len-input_ids.size(-1)]
-            #     print("New context id size", context_ids.size(1))
-            #     context_attention_mask = context_attention_mask[:, :context_ids_len-input_ids.size(-1)]
+            if self.target_token == 4096 and not self.is_full:
+                context_ids_len = context_ids.size(1)
+                context_ids = context_ids[:, :context_ids_len-input_ids.size(-1)]
+                print("New context id size", context_ids.size(1))
+                context_attention_mask = context_attention_mask[:, :context_ids_len-input_ids.size(-1)]
             start_processing_time = time.time()
             
             with torch.no_grad():

@@ -12,7 +12,7 @@ test:
         use_fp16: False
         dataset_name: "THUDM/LongBench"
         pad_to_max_length: False
-        max_length: 1024
+        max_length: 256
         max_answer_length: 128
         dataset_config_name: "qasper"
         train_file: None

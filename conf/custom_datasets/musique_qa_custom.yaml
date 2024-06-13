@@ -12,7 +12,7 @@ test:
         use_fp16: False
         dataset_name: "THUDM/LongBench"
         pad_to_max_length: False
-        max_length: 256
+        max_length: 128
         max_answer_length: 32
         dataset_config_name: "musique"
         train_file: None

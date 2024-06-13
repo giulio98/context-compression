@@ -1,6 +1,6 @@
 site_name: context-compression
 site_description: A new awesome project.
-repo_url: https://github.com/giulio98/context-compression
+repo_url: https://github.com/anonymous/context-compression
 
 nav:
   - Home: index.md

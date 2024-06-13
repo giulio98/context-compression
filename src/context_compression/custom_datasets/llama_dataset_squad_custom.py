@@ -213,7 +213,7 @@ class LlamaDatasetCustom(CausalModelingDataset, ABC):
         )
         
 
-        if self.max_context_length in [256, 128, 64, 32, 512, 1000, 2000]:
+        if self.max_context_length in [384, 256, 192, 160, 144, 512, 1000, 2000, 3968, 3776, 3808, 3456, 3708, 2944, 3958, 3336, 3488, 3904]:
             if self.use_rag:
                 print("RAG!")
                 tokenized_contexts = self.tokenize_contexts_rag(contexts, questions)

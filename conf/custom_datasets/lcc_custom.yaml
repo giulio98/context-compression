@@ -12,7 +12,7 @@ test:
         use_fp16: False
         dataset_name: "THUDM/LongBench"
         pad_to_max_length: False
-        max_length: 10000
+        max_length: 128
         max_answer_length: 64
         dataset_config_name: "lcc"
         train_file: None

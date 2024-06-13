@@ -810,7 +810,7 @@ class MistralForCompressedCausalLM(MistralForCausalLM):
                         )
             return model_output
         else:
-            if self.target_token == 32768:
+            if self.target_token == 32768 and not self.is_full:
                 context_ids_len = context_ids.size(1)
                 context_ids = context_ids[:, :context_ids_len-input_ids.size(-1)]
                 context_attention_mask = context_attention_mask[:, :context_ids_len-input_ids.size(-1)]
